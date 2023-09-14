@@ -1,0 +1,114 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "url": {
+                "type": "string",
+                "format": "uri"
+            },
+            "title": {
+                "type": "string"
+            },
+            "description": {
+                "type": "string"
+            },
+            "type": {
+                "type": "string"
+            },
+            "author_name": {
+                "type": "string"
+            },
+            "author_url": {
+                "oneOf": [
+                    {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ]
+            },
+            "provider_name": {
+                "type": "string"
+            },
+            "provider_url": {
+                "oneOf": [
+                    {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ]
+            },
+            "html": {
+                "type": "string"
+            },
+            "width": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "height": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "image": {
+                "type": "string",
+                "format": "uri"
+            },
+            "embed_url": {
+                "oneOf": [
+                    {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    {
+                        "type": "string",
+                        "maxLength": 0
+                    }
+                ]
+            },
+            "blurhash": {
+                "type": "string"
+            },
+            "history": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "day": {
+                            "type": "string",
+                            "pattern": "^[0-9]+$"
+                        },
+                        "accounts": {
+                            "type": "string",
+                            "pattern": "^[0-9]+$"
+                        },
+                        "uses": {
+                            "type": "string",
+                            "pattern": "^[0-9]+$"
+                        }
+                    },
+                    "required": [
+                        "day",
+                        "accounts",
+                        "uses"
+                    ]
+                }
+            }
+        },
+        "required": [
+            "url",
+            "title",
+            "type",
+            "provider_name",
+            "image",
+            "history"
+        ]
+    }
+}

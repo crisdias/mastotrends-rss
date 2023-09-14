@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+    <channel>
+        <title>{{ feed.title }}</title>
+        <link>{{ feed.link }}</link>
+        <description>{{ feed.description }}</description>
+        <lastBuildDate>{{ feed.lastBuildDate|date("D, d M Y H:i:s O") }}</lastBuildDate>
+        <generator>Your RSS Generator</generator>
+
+        {% for item in items %}
+        <item>
+            <title>{{ item.title }}</title>
+            <link>{{ item.link }}</link>
+            <description>{{ item.description }}</description>
+            <guid>{{ item.guid }}</guid>
+        </item>
+        {% endfor %}
+    </channel>
+</rss>
