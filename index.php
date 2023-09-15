@@ -8,6 +8,9 @@ use Slim\Factory\AppFactory;
 require_once 'util.php';
 
 $app = AppFactory::create();
+if (!defined('CACHE')) {
+    define('CACHE', true);
+}
 
 
 $app->get('/', function (Request $request, Response $response, $args) {
@@ -24,9 +27,10 @@ $app->get('/feed/{domain}', function (Request $request, Response $response, $arg
     // Construa um nome de arquivo único com base na URL da solicitação
     $cacheKey = md5($request->getUri()->getPath());
 
+
     // Verifique se a resposta está em cache e se ainda é válida
     $cacheFilePath = "$cacheDirectory/$cacheKey.xml";
-    if (file_exists($cacheFilePath) && (time() - filemtime($cacheFilePath)) < $cacheLifetime) {
+    if (CACHE && file_exists($cacheFilePath) && (time() - filemtime($cacheFilePath)) < $cacheLifetime) {
         // Se a resposta estiver em cache e válida, retorne-a diretamente
         $response = $response->withHeader('Content-Type', 'application/rss+xml');
         $response->getBody()->write(file_get_contents($cacheFilePath));
@@ -40,7 +44,7 @@ $app->get('/feed/{domain}', function (Request $request, Response $response, $arg
         return $response;
     }
 
-    $json = file_get_contents("https://$domain/api/v1/trends/links?limit=100");
+    $json = download_trends($domain);
     if (valida_json($json) === false) {
         $response->getBody()->write("JSON inválido");
         return $response;

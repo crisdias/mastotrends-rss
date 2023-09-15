@@ -62,6 +62,39 @@ function parseJsonToItems($json) {
     return $items;
 }
 
+function download_trends($domain) {
+    $limit = 20;  // Número máximo de registros para recuperar por chamada de API
+    $offset = 0;  // Inicializa o offset em 0
+    $all_trends = [];  // Array para armazenar todos os registros recuperados
 
+    while (true) {
+        // Monta a URL com os parâmetros limit e offset
+        $url = 'https://' . $domain . '/api/v1/trends/links?limit=' . $limit . '&offset=' . $offset;
+
+        // Faz a chamada da API
+        $json = file_get_contents($url);
+        $trends = json_decode($json, true);  // Decodifica o JSON em um array
+
+        // Verifica se algum dado foi retornado
+        if (empty($trends)) {
+            break;  // Sai do loop se nenhum dado foi retornado
+        }
+
+        // Adiciona os registros recuperados ao array all_trends
+        $all_trends = array_merge($all_trends, $trends);
+
+
+        // Atualiza o offset para a próxima chamada
+        $offset += $limit;
+    }
+    return json_encode($all_trends);  // Retorna todos os registros em formato JSON
+}
+
+
+function debugme($var) {
+    echo '<pre>';
+    echo htmlentities(print_r($var, true));
+    echo '</pre>';
+}
 
 ?>
