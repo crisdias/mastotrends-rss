@@ -2,4 +2,5 @@ vendor
 ursal.json
 _cache
 _twigcache
-server.sh
+baka.*
+debug.log

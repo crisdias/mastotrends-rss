@@ -4,8 +4,61 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a341b5df06d3922483b06e3a5f3c09a2",
+    "content-hash": "ff3302e452cd5baa5d4c9b6d6f55da0c",
     "packages": [
+        {
+            "name": "andreskrey/readability.php",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/andreskrey/readability.php.git",
+                "reference": "0d02e2916d1659bb79426969c5d48848ff402598"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/andreskrey/readability.php/zipball/0d02e2916d1659bb79426969c5d48848ff402598",
+                "reference": "0d02e2916d1659bb79426969c5d48848ff402598",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-mbstring": "*",
+                "ext-xml": "*",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "andreskrey\\Readability\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Andres Rey",
+                    "email": "andreskrey@gmail.com",
+                    "role": "Lead Developer"
+                }
+            ],
+            "description": "A PHP port of Readability.js",
+            "homepage": "https://github.com/andreskrey/readability",
+            "keywords": [
+                "html",
+                "readability"
+            ],
+            "support": {
+                "issues": "https://github.com/andreskrey/readability.php/issues",
+                "source": "https://github.com/andreskrey/readability.php/tree/v1.0.0"
+            },
+            "abandoned": "fivefilters/readability.php",
+            "time": "2017-12-03T12:24:28+00:00"
+        },
         {
             "name": "fig/http-message-util",
             "version": "1.1.5",

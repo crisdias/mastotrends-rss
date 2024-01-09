@@ -1,0 +1,10 @@
+{
+    "watch": [
+        "*.php"
+    ],
+    "exclude": [
+        "_twigcache/**/*"
+    ],
+    "exec": "sh development-server.sh",
+    "ext": "php"
+}

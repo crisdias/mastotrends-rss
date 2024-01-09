@@ -1,16 +1,19 @@
 <?php
+
 require __DIR__ . '/vendor/autoload.php';
+require_once 'util.php';
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 
-require_once 'util.php';
-
 $app = AppFactory::create();
 if (!defined('CACHE')) {
     define('CACHE', true);
 }
+
+purge_cache_files(__DIR__ . '/_cache/read/', 10);
+
 
 
 $app->get('/', function (Request $request, Response $response, $args) {
@@ -59,7 +62,7 @@ $app->get('/feed/{domain}', function (Request $request, Response $response, $arg
             'title' => 'Trending at ' . $domain,
             'link' => 'https://' . $domain,
             'description' => 'Mastodon trends at ' . $domain,
-            'lastBuildDate' => date(DATE_RSS), // Data atual no formato RSS
+            'lastBuildDate' => date(DATE_RSS) // Data atual no formato RSS
         ],
         'items' => $items,
     ];
@@ -71,7 +74,6 @@ $app->get('/feed/{domain}', function (Request $request, Response $response, $arg
     $template = $twig->load('rss.twig');
     $feed = $template->render($twig_input);
 
-    // debugme($feed); die();
     file_put_contents($cacheFilePath, $feed);
 
 
@@ -80,6 +82,7 @@ $app->get('/feed/{domain}', function (Request $request, Response $response, $arg
     $response->getBody()->write($feed);
     return $response->withHeader('Content-Type', 'application/rss+xml');
 });
+
 
 
 
