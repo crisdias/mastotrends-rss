@@ -5,6 +5,7 @@ use andreskrey\Readability\Configuration;
 use andreskrey\Readability\ParseException;
 
 
+
 function valida_json($input) {
     // Carrega o JSON Schema do arquivo schema.json
     $schema_file = __DIR__ . '/schema.json';
@@ -106,21 +107,46 @@ function get_readable_content($url) {
     }
 }
 
+function sanitize_html_for_xml($html) {
+    $config = HTMLPurifier_Config::createDefault();
+    $config->set('HTML.Allowed', 'p,br,h1,h2,h3,h4,h5,h6,ul,ol,li,a[href],strong,em,blockquote,img,embed');
+    $config->set('HTML.TargetBlank', true);
+    $config->set('Core.Encoding', 'UTF-8');
+
+    $purifier = new HTMLPurifier($config);
+    return $purifier->purify($html);
+}
+
 function parseJsonToItems($json) {
     $input = json_decode($json);
     $items = [];
 
     foreach ($input as $item) {
+        $guid = htmlspecialchars($item->url, ENT_QUOTES | ENT_XML1, 'UTF-8');
+        # check if guid already exists in $items
+        $guid_exists = false;
+        foreach ($items as $i) {
+            if ($i['guid'] == $guid) {
+                $guid_exists = true;
+                break;
+            }
+        }
+        if ($guid_exists) {
+            continue;
+        }
+
         $readable = get_readable_content($item->url);
         if (!$readable) {
             $readable = $item->provider_name . ' | ' . $item->description;
         }
 
+        $readable = sanitize_html_for_xml($readable);
+
         $parsedItem = [
-            'title' => $item->title,
-            'link' => $item->url,
+            'title' => htmlspecialchars($item->title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+            'link' => htmlspecialchars($item->url, ENT_QUOTES | ENT_XML1, 'UTF-8'),
             'description' => $readable,
-            'guid' => $item->url
+            'guid' => $guid
         ];
 
         $items[] = $parsedItem;
@@ -128,6 +154,7 @@ function parseJsonToItems($json) {
 
     return $items;
 }
+
 
 function download_trends($domain) {
     $limit = 50; // Número máximo de registros para recuperar
