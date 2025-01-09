@@ -117,21 +117,46 @@ function sanitize_html_for_xml($html) {
     return $purifier->purify($html);
 }
 
+function get_blocked_words() {
+    $blocked_words = file_get_contents(__DIR__ . '/blocked_words.txt');
+    $blocked_words = explode("\n", $blocked_words);
+    $blocked_words = array_map('trim', $blocked_words);
+    $blocked_words = array_filter($blocked_words);
+    return $blocked_words;
+}
+
+function check_blocked_content($text, $blocked_words) {
+    $text = strtolower($text); // converte para minúsculo para comparação case-insensitive
+
+    foreach ($blocked_words as $word) {
+        $word = strtolower(trim($word));
+        if (!empty($word) && strpos($text, $word) !== false) {
+            debugme("Blocked word found: " . $word . " in text: " . substr($text, 0, 100) . "...");
+            return true;
+        }
+    }
+    return false;
+}
+
 function parseJsonToItems($json) {
     $input = json_decode($json);
     $items = [];
+    $used_guids = [];
+
+    $blocked_words = get_blocked_words();
+    debugme("Loaded blocked words: " . print_r($blocked_words, true));
 
     foreach ($input as $item) {
         $guid = htmlspecialchars($item->url, ENT_QUOTES | ENT_XML1, 'UTF-8');
-        # check if guid already exists in $items
-        $guid_exists = false;
-        foreach ($items as $i) {
-            if ($i['guid'] == $guid) {
-                $guid_exists = true;
-                break;
-            }
+
+        if (in_array($guid, $used_guids)) {
+            debugme("Skipping duplicate GUID: " . $guid);
+            continue;
         }
-        if ($guid_exists) {
+
+        // Verifica o título antes de buscar o conteúdo
+        if (check_blocked_content($item->title, $blocked_words)) {
+            debugme("Skipping item due to blocked word in title: " . $item->title);
             continue;
         }
 
@@ -141,6 +166,14 @@ function parseJsonToItems($json) {
         }
 
         $readable = sanitize_html_for_xml($readable);
+
+        // Verifica o conteúdo
+        if (check_blocked_content($readable, $blocked_words)) {
+            debugme("Skipping item due to blocked word in content: " . substr($readable, 0, 100) . "...");
+            continue;
+        }
+
+        $used_guids[] = $guid;
 
         $parsedItem = [
             'title' => htmlspecialchars($item->title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
