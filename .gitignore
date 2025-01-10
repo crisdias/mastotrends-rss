@@ -4,3 +4,4 @@ _cache
 _twigcache
 baka.*
 debug.log
+blocked_words.txt

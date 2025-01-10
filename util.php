@@ -138,25 +138,65 @@ function check_blocked_content($text, $blocked_words) {
     return false;
 }
 
+function convert_relative_urls($html, $base_url) {
+    if (empty($html)) return $html;
+
+    // Remove trailing slash from base_url if exists
+    $base_url = rtrim($base_url, '/');
+
+    // Converte URLs que começam com / (path absoluto)
+    $html = preg_replace_callback(
+        '/(src|href)=(["\'])(\/[^"\']*)(["\'])/i',
+        function($matches) use ($base_url) {
+            return $matches[1] . '=' . $matches[2] . $base_url . $matches[3] . $matches[4];
+        },
+        $html
+    );
+
+    // Converte URLs que começam com # (âncoras)
+    $html = preg_replace_callback(
+        '/(href=["\'](#[^"\']*)["\'])/i',
+        function($matches) use ($base_url) {
+            $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+            return 'href="' . $base_url . $currentPath . $matches[2] . '"';
+        },
+        $html
+    );
+
+    // Converte URLs relativas (sem / no início)
+    $html = preg_replace_callback(
+        '/(src|href)=(["\'])(?!\w+:\/\/)(?!\/|#)([^"\']*)(["\'])/i',
+        function($matches) use ($base_url) {
+            return $matches[1] . '=' . $matches[2] . $base_url . '/' . $matches[3] . $matches[4];
+        },
+        $html
+    );
+
+    // Remove referências de caminho relativo ../
+    $html = preg_replace('/\.\.\//', '', $html);
+
+    return $html;
+}
+
+
+
 function parseJsonToItems($json) {
     $input = json_decode($json);
     $items = [];
     $used_guids = [];
 
     $blocked_words = get_blocked_words();
-    debugme("Loaded blocked words: " . print_r($blocked_words, true));
 
     foreach ($input as $item) {
+        debugme("\n\nProcessing new item: " . $item->url);
+
         $guid = htmlspecialchars($item->url, ENT_QUOTES | ENT_XML1, 'UTF-8');
 
         if (in_array($guid, $used_guids)) {
-            debugme("Skipping duplicate GUID: " . $guid);
             continue;
         }
 
-        // Verifica o título antes de buscar o conteúdo
         if (check_blocked_content($item->title, $blocked_words)) {
-            debugme("Skipping item due to blocked word in title: " . $item->title);
             continue;
         }
 
@@ -165,18 +205,18 @@ function parseJsonToItems($json) {
             $readable = $item->provider_name . ' | ' . $item->description;
         }
 
+        $base_url = parse_url($item->url, PHP_URL_SCHEME) . '://' . parse_url($item->url, PHP_URL_HOST);
+        $readable = convert_relative_urls($readable, $base_url);
         $readable = sanitize_html_for_xml($readable);
 
-        // Verifica o conteúdo
         if (check_blocked_content($readable, $blocked_words)) {
-            debugme("Skipping item due to blocked word in content: " . substr($readable, 0, 100) . "...");
             continue;
         }
 
         $used_guids[] = $guid;
 
         $parsedItem = [
-            'title' => htmlspecialchars($item->title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+            'title' => $item->title,
             'link' => htmlspecialchars($item->url, ENT_QUOTES | ENT_XML1, 'UTF-8'),
             'description' => $readable,
             'guid' => $guid

@@ -20,16 +20,7 @@
                 "type": "string"
             },
             "author_url": {
-                "oneOf": [
-                    {
-                        "type": "string",
-                        "format": "uri"
-                    },
-                    {
-                        "type": "string",
-                        "maxLength": 0
-                    }
-                ]
+                "type": ["string", "null"]
             },
             "provider_name": {
                 "type": "string"

@@ -1,4 +1,7 @@
 <?php
+if (getenv('APP_ENV') !== 'development') {
+    error_reporting(0);
+}
 
 require __DIR__ . '/vendor/autoload.php';
 require_once 'util.php';
@@ -62,7 +65,8 @@ $app->get('/feed/{domain}', function (Request $request, Response $response, $arg
             'title' => 'Trending at ' . $domain,
             'link' => 'https://' . $domain,
             'description' => 'Mastodon trends at ' . $domain,
-            'lastBuildDate' => date(DATE_RSS) // Data atual no formato RSS
+            'lastBuildDate' => date(DATE_RSS),
+            'self_link' => 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']
         ],
         'items' => $items,
     ];
@@ -70,7 +74,16 @@ $app->get('/feed/{domain}', function (Request $request, Response $response, $arg
     $loader = new \Twig\Loader\FilesystemLoader('views');
     $twig = new \Twig\Environment($loader, [
         'cache' => '_twigcache',
+        'autoescape' => false
     ]);
+
+    // // Adiciona o filtro personalizado
+    // $twig->addFilter(new \Twig\TwigFilter('clean_rss_title', function ($string) {
+    //     $string = str_replace('&quot;', '"', $string);
+    //     $string = str_replace('"', '"', $string);
+    //     return $string;
+    // }));
+
     $template = $twig->load('rss.twig');
     $feed = $template->render($twig_input);
 
