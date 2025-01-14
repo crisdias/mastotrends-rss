@@ -13,8 +13,11 @@
         <item>
             <title>{{ item.title }}</title>
             <link>{{ item.link }}</link>
+            <enclosure url="{{ item.image }}" length="0" type="{{ item.image_mime }}"/>
             <description><![CDATA[{{ item.description|raw }}]]></description>
             <guid>{{ item.guid }}</guid>
+            {% if item.image %}
+            {% endif %}
         </item>
         {% endfor %}
     </channel>

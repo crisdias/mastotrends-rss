@@ -95,8 +95,10 @@ function get_readable_content($url) {
         // save to cache
         $content = $readability->getContent();
 
+        $sources_link = "https://ursal.zone/links/" . urlencode($url);
+
         $domain = get_domain_from_url($url);
-        $content = "<p><small>($domain)</small></p>" . $content;
+        $content = "<p><small>($domain) - (<a href=\"$sources_link\">sources</a>)</small></p>" . $content;
 
         file_put_contents($cacheFilePath, $content);
 
@@ -188,7 +190,7 @@ function parseJsonToItems($json) {
     $blocked_words = get_blocked_words();
 
     foreach ($input as $item) {
-        debugme("\n\nProcessing new item: " . $item->url);
+        // debugme("\n\nProcessing new item: " . $item->url);
 
         $guid = htmlspecialchars($item->url, ENT_QUOTES | ENT_XML1, 'UTF-8');
 
@@ -214,9 +216,14 @@ function parseJsonToItems($json) {
         }
 
         $used_guids[] = $guid;
+        $filtered_title = htmlspecialchars($item->title, ENT_NOQUOTES);
+
+        $image_mime_type = get_image_mime($item->image);
 
         $parsedItem = [
-            'title' => $item->title,
+            'title' => $filtered_title,
+            'image' => $item->image,
+            'image_mime' => $image_mime_type,
             'link' => htmlspecialchars($item->url, ENT_QUOTES | ENT_XML1, 'UTF-8'),
             'description' => $readable,
             'guid' => $guid
@@ -228,6 +235,13 @@ function parseJsonToItems($json) {
     return $items;
 }
 
+function get_image_mime($url) {
+    $headers = get_headers($url, 1);
+    if (isset($headers['Content-Type'])) {
+        return $headers['Content-Type'];
+    }
+    return false;
+}
 
 function download_trends($domain) {
     $limit = 50; // Número máximo de registros para recuperar
