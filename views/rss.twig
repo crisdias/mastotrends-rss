@@ -10,7 +10,7 @@
         <atom:link href="{{ feed.self_link }}" rel="self" type="application/rss+xml" />
 
         {% for item in items %}
-        <item>
+        <item xml:lang="{{ item.language }}">
             <title>{{ item.title }}</title>
             <link>{{ item.link }}</link>
             <enclosure url="{{ item.image }}" length="0" type="{{ item.image_mime }}"/>

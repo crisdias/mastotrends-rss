@@ -225,12 +225,13 @@ function parseJsonToItems($json) {
         $image_mime_type = get_image_mime($item->image);
 
         $parsedItem = [
-            'title' => $filtered_title,
-            'image' => $item->image,
-            'image_mime' => $image_mime_type,
-            'link' => htmlspecialchars($item->url, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+            'title'       => $filtered_title,
+            'image'       => $item->image,
+            'language'    => $item->language,
+            'image_mime'  => $image_mime_type,
+            'link'        => htmlspecialchars($item->url, ENT_QUOTES | ENT_XML1, 'UTF-8'),
             'description' => $readable,
-            'guid' => $guid
+            'guid'        => $guid
         ];
 
         $items[] = $parsedItem;
