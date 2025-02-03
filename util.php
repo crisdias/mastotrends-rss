@@ -87,8 +87,11 @@ function get_readable_content($url) {
         return $content;
     }
 
+    $html = get_page_content($url);
+    if (!$html) {
+        return false;
+    }
 
-    $html = file_get_contents($url);
 
     try {
         $readability->parse($html);
@@ -183,6 +186,7 @@ function convert_relative_urls($html, $base_url) {
 
 
 function parseJsonToItems($json) {
+    debugme("entrei no parseJsonToItems");
     $input = json_decode($json);
     $items = [];
     $used_guids = [];
@@ -286,8 +290,45 @@ function debugme($var) {
     // echo htmlentities(print_r($var, true));
     // echo '</pre>';
 
+
+    if (getenv('APP_ENV') !== 'development') {
+        return;
+    }
+
     // error_log(''. print_r($var, true) . "\n", 3, __DIR__ . '/debug.log');
-    file_put_contents(__DIR__ . '/debug.log', print_r($var, true) . "\n", FILE_APPEND);
+    file_put_contents(__DIR__ . '/debug.log', print_r($var, true) . "\n\n", FILE_APPEND);
 }
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+
+function get_page_content($url) {
+    debugme("get_page_content: $url");
+    $client = new Client([
+        'timeout'         => 5.0,
+        'connect_timeout' => 5.0,
+        'headers' => [
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+        ],
+        'allow_redirects' => true
+    ]);
+
+
+
+
+    try {
+        $response = $client->get($url);
+        $html = (string) $response->getBody();
+
+        // Normalizar encoding
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+
+        return $html;
+    } catch (RequestException $e) {
+        error_log("Erro ao buscar a URL $url: " . $e->getMessage());
+        return null;
+    }
+}
+
 
 ?>

@@ -3,6 +3,9 @@ if (getenv('APP_ENV') !== 'development') {
     error_reporting(0);
 }
 
+ini_set('default_socket_timeout', 5);
+ini_set('max_execution_time', 5 * 60);
+
 require __DIR__ . '/vendor/autoload.php';
 require_once 'util.php';
 
@@ -16,6 +19,17 @@ if (!defined('CACHE')) {
 }
 
 purge_cache_files(__DIR__ . '/_cache/read/', 10);
+
+
+
+
+
+for ($i = 0; $i < 10; $i++) {
+    debugme(" ");
+}
+$datetimenow = date('Y-m-d H:i:s');
+debugme($datetimenow);
+debugme("--------------------");
 
 
 
