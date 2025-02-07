@@ -316,7 +316,6 @@ function get_page_content($url) {
 
 
 
-
     try {
         $response = $client->get($url);
         $html = (string) $response->getBody();
@@ -325,8 +324,8 @@ function get_page_content($url) {
         $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
 
         return $html;
-    } catch (RequestException $e) {
-        error_log("Erro ao buscar a URL $url: " . $e->getMessage());
+    } catch (\Exception $e) {
+        debugme("Erro ao buscar a URL $url: " . $e->getMessage());
         return null;
     }
 }

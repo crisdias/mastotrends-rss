@@ -107,6 +107,7 @@ $app->get('/feed/{domain}', function (Request $request, Response $response, $arg
     // Defina o tipo de conteúdo como RSS e retorne a resposta
     $response = $response->withHeader('Cache-Control', 'public, max-age=3600');
     $response->getBody()->write($feed);
+    debugme("Fim do processamento.");
     return $response->withHeader('Content-Type', 'application/rss+xml');
 });
 
