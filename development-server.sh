@@ -11,4 +11,4 @@ rm -f _cache/b180345327557f4560fffe9b01b7aae4.xml
 export APP_ENV="development"
 
 # Inicia o servidor PHP
-php -S 0.0.0.0:3000 -t . router.php
+php -S 127.0.0.1:3000 -t . router.php

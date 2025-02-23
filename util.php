@@ -241,9 +241,17 @@ function parseJsonToItems($json) {
 }
 
 function get_image_mime($url) {
-    $headers = get_headers($url, 1);
-    if (isset($headers['Content-Type'])) {
-        return $headers['Content-Type'];
+    if (empty($url)) {
+        return false;
+    }
+    try {
+        $headers = get_headers($url, 1);
+        if (isset($headers['Content-Type'])) {
+            return $headers['Content-Type'];
+        }
+    }
+    catch (Exception $e) {
+        return false;
     }
     return false;
 }
